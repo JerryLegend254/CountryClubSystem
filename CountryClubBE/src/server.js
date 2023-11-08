@@ -1,16 +1,37 @@
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const sgMail = require("@sendgrid/mail");
 const speakeasy = require("speakeasy");
+require("dotenv").config()
 
+const PORT = process.env.PORT || 8000
+
+const data = [
+  {
+    displayName: "Jeremy Okuto",
+    email: "jerryokuto713@gmail.com",
+    photoURL:
+      "https://static1.srcdn.com/wordpress/wp-content/uploads/2019/01/movmvslnmshxbu0ydicq.jpg?q=50&fit=crop&w=1500&dpr=1.5",
+  },
+];
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3030",
+  })
+);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 const secretKey = speakeasy.generateSecret({ length: 20 });
-sgMail.setApiKey(
-  "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"
-);
+sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
+
+app.get("/data", (req, res) => {
+  console.log("Data fetched");
+  res.status(200).json(data[0]);
+});
 
 // Send the OTP code via email using SendGrid
 app.post("/send-otp", (req, res) => {
@@ -20,7 +41,7 @@ app.post("/send-otp", (req, res) => {
   });
 
   const msg = {
-    to: "jerryokuto713@gmail.com",
+    to: req.body.toEmail,
     from: "jeremy.okuto@strathmore.edu",
     subject: "Your OTP Code",
     text: `Your OTP code is: ${otpCode}`,
@@ -38,6 +59,8 @@ app.post("/send-otp", (req, res) => {
     });
 });
 
+
+
 // Verify the OTP code
 app.post("/verify-otp", (req, res) => {
   const isValid = speakeasy.totp.verify({
@@ -46,9 +69,7 @@ app.post("/verify-otp", (req, res) => {
     token: req.body.otp,
     window: 6,
   });
-
-  console.log(req.body.otp);
-
+  
   if (isValid) {
     // 2FA is successfully verified
     res.status(200).send("2FA verification successful");
@@ -57,6 +78,6 @@ app.post("/verify-otp", (req, res) => {
   }
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log("Server is running on port 3000");
 });

@@ -1,0 +1,15 @@
+{
+  "name": "countryclubsystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run server & npm run client",
+    "server": "npm start --prefix CountryClubBE",
+    "client": "npm run dev --prefix CountryClubFE",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
