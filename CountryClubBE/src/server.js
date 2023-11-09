@@ -1,11 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require("path");
 const sgMail = require("@sendgrid/mail");
 const speakeasy = require("speakeasy");
-require("dotenv").config()
+const AuthRouter = require("./routes/auth/auth.routes");
+require("dotenv").config();
 
-const PORT = process.env.PORT || 8000
+const PORT = process.env.PORT || 8000;
 
 const data = [
   {
@@ -22,12 +24,14 @@ app.use(
     origin: "http://localhost:3030",
   })
 );
+app.use(express.static(path.join(__dirname, "..", "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 const secretKey = speakeasy.generateSecret({ length: 20 });
 sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
 
+app.use("/auth", AuthRouter);
 app.get("/data", (req, res) => {
   console.log("Data fetched");
   res.status(200).json(data[0]);
@@ -59,8 +63,6 @@ app.post("/send-otp", (req, res) => {
     });
 });
 
-
-
 // Verify the OTP code
 app.post("/verify-otp", (req, res) => {
   const isValid = speakeasy.totp.verify({
@@ -69,7 +71,7 @@ app.post("/verify-otp", (req, res) => {
     token: req.body.otp,
     window: 6,
   });
-  
+
   if (isValid) {
     // 2FA is successfully verified
     res.status(200).send("2FA verification successful");
@@ -78,6 +80,9 @@ app.post("/verify-otp", (req, res) => {
   }
 });
 
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+});
 app.listen(PORT, () => {
-  console.log("Server is running on port 3000");
+  console.log(`Server is running on port ${PORT}`);
 });

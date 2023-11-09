@@ -7,6 +7,7 @@ import Router from 'src/routes/sections';
 import ThemeProvider from 'src/theme';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AuthContextProvider from './hooks/use-auth';
 
 // ----------------------------------------------------------------------
 
@@ -16,9 +17,11 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <Router />
-      </ThemeProvider>
+      <AuthContextProvider>
+        <ThemeProvider>
+          <Router />
+        </ThemeProvider>
+      </AuthContextProvider>
     </QueryClientProvider>
   );
 }

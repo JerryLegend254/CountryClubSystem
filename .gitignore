@@ -1,3 +1,4 @@
 node_modules
 .env
-city.model.js
+city.modeyl.js
+public
