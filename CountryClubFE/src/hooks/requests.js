@@ -26,3 +26,17 @@ export async function httpEmailSignUp(credentails) {
     body: JSON.stringify(credentails),
   });
 }
+
+export async function httpEmailSignIn(credentails) {
+  return fetch(`${API_URL}/auth/signin`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentails),
+  });
+}
+
+export async function httpSignOut() {
+  return fetch(`${API_URL}/auth/signout`)
+}

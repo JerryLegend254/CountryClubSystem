@@ -1,14 +1,66 @@
 import PropTypes from 'prop-types';
 import { useState, useContext, createContext } from 'react';
 
+import { httpSignOut, httpEmailSignIn, httpEmailSignUp } from './requests';
+
 const AuthContext = createContext();
 
 function AuthContextProvider({ children }) {
-  const [user] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function signup(email, username, password, confPassword) {
+    if (password !== confPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    try {
+      setError('');
+      setIsLoading(true);
+      const res = await httpEmailSignUp({ email, password, username});
+      const parsedRes = await res.json();
+      setUser(parsedRes?.user);
+      setError(parsedRes?.error);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  async function login(email, password) {
+    try {
+      setError('');
+      setIsLoading(true);
+      const res = await httpEmailSignIn({ email, password });
+      const parsedRes = await res.json();
+      setUser(parsedRes?.user);
+      setError(parsedRes?.error);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function logout() {
+    try {
+      await httpSignOut();
+      setUser(null);
+    } catch (err) {
+      setError(err);
+    }
+  }
 
 
-  // eslint-disable-next-line react/jsx-no-constructed-context-values
-  return <AuthContext.Provider value={{ user, isAuthenticated: !!user }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      // eslint-disable-next-line react/jsx-no-constructed-context-values
+      value={{ user, isAuthenticated: !!user, login, logout, isLoading, error, signup, setError }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

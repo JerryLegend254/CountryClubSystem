@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -13,40 +14,47 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 
-// import { useRouter } from 'src/routes/hooks';
+import { useRouter } from 'src/routes/hooks';
 
-import { httpEmailSignUp } from 'src/hooks/requests';
+import { useAuth } from 'src/hooks/use-auth';
 
 import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
+// eslint-disable-next-line import/no-cycle
+import { showError } from '../login/login-view';
+
 // ----------------------------------------------------------------------
 
+
+export function formatError(error) {
+  return error.replace("Firebase: Error ", "")
+}
 export default function SignInView() {
   const theme = useTheme();
 
-  // const router = useRouter();
+  const router = useRouter();
   const [email, setEmail] = useState('jerryokuto@gmail.com');
-  const [password, setPassword] = useState('pass');
-  const [confPass, setConfPass] = useState('pass');
-  const [err, setError] = useState('');
+  const [username, setUsername] = useState('JerryLegend254');
+  const [password, setPassword] = useState('password');
+  const [confPass, setConfPass] = useState('password');
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
 
-  const handleClick = async () => {
-    const res = await httpEmailSignUp({ email, password });
-    const data = await res.json();
-    console.log(data);
-    if (!res.ok) {
-      setError(data.error.code);
-      return;
-    }
+  const { signup, error, isLoading, isAuthenticated } = useAuth();
 
-    console.log("User added")
+  const handleClick = async () => {
+    await signup(email, username, password, confPass);
+    if (error) showError(formatError(error));
   };
+
+  useEffect(() => {
+    if (isAuthenticated) router.push('/');
+  }, [isAuthenticated, router]);
+
 
   const renderForm = (
     <>
@@ -56,6 +64,12 @@ export default function SignInView() {
           label="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          name="username"
+          label="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
 
         <TextField
@@ -91,7 +105,6 @@ export default function SignInView() {
           }}
         />
       </Stack>
-      <Typography variant="h5">{err}</Typography>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
         <Link variant="subtitle2" underline="hover">
@@ -106,6 +119,7 @@ export default function SignInView() {
         variant="contained"
         color="inherit"
         onClick={handleClick}
+        disabled={isLoading}
       >
         Sign Up
       </LoadingButton>
@@ -141,10 +155,10 @@ export default function SignInView() {
           <Typography variant="h4">Sign up to Jerked C.C</Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
-            </Link>
+            Already have an account?
+            <NavLink variant="subtitle2" sx={{ ml: 0.5 }} to="/login">
+              Login
+            </NavLink>
           </Typography>
 
           <Stack direction="row" spacing={2}>

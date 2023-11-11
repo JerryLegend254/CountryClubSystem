@@ -1,14 +1,24 @@
-const { initializeApp } = require("firebase/app");
+// const { initializeApp } = require("firebase/app");
+// const {
+//   getFirestore,
+//   doc,
+//   setDoc,
+//   collection,
+//   addDoc,
+//   query,
+//   getDocs,
+// } = require("firebase/firestore");
 const {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  addDoc,
-  query,
-  getDocs,
-} = require("firebase/firestore");
-const {  getAuth, createUserWithEmailAndPassword} = require("firebase/auth");
+  getAuth: getClientAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} = require("firebase/auth");
+const { initializeApp: adminInitApp, cert } = require("firebase-admin/app");
+const { initializeApp: clientInitApp } = require("firebase/app");
+const { getAuth: getAdminAuth } = require("firebase-admin/auth");
+
+const serviceAccount = require("./firebase-adm-sdk.json");
 
 // const firebaseConfig = {
 //   apiKey: "AIzaSyBj16t-OXZtQlDKo5AWA4mr-QmKghLcF4E",
@@ -29,19 +39,34 @@ const firebaseConfig = {
   appId: "1:1063370598366:web:00b05aa719ed6aebbfdf4f",
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const adminApp = adminInitApp({
+  credential: cert(serviceAccount),
+  databaseURL: "https://your-project-id.firebaseio.com",
+});
 
+const clientApp = clientInitApp(firebaseConfig);
+const adminAuth = getAdminAuth(adminApp);
+const clientAuth = getClientAuth(clientApp);
+// const db = getFirestore(app);
+
+// module.exports = {
+//   doc,
+//   setDoc,
+//   db,
+//   collection,
+//   addDoc,
+//   query,
+//   getDocs,
+//   auth,
+//   createUserWithEmailAndPassword,
+//   signInWithEmailAndPassword,
+//   signOut,
+//   updateProfile,
+// };
 
 module.exports = {
-  doc,
-  setDoc,
-  db,
-  collection,
-  addDoc,
-  query,
-  getDocs,
-  auth,
-  createUserWithEmailAndPassword
+  adminAuth,
+  clientAuth,
+  signInWithEmailAndPassword,
+  signOut,
 };

@@ -1,9 +1,11 @@
 const express = require("express")
-const { httpEmailSignIn } = require("./auth.controller")
+const { httpEmailSignIn, httpEmailSignUp, httpSignOut } = require("./auth.controller")
 
 const AuthRouter = express.Router()
 
-AuthRouter.post("/signup", httpEmailSignIn)
+AuthRouter.post("/signup", httpEmailSignUp)
+AuthRouter.post("/signin", httpEmailSignIn)
+AuthRouter.get("/signout", httpSignOut);
 
 
 module.exports = AuthRouter

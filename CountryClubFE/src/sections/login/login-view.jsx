@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -15,33 +17,56 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import { useRouter } from 'src/routes/hooks';
 
+import { useAuth } from 'src/hooks/use-auth';
+
 import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
+// eslint-disable-next-line import/no-cycle
+import { formatError } from '../signup/signup-view';
+
 // ----------------------------------------------------------------------
 
+export function showError(error) {
+  toast.error(error);
+}
 export default function LoginView() {
   const theme = useTheme();
 
   const router = useRouter();
+  const [email, setEmail] = useState('test2@dev.com');
+  const [password, setPassword] = useState('password');
 
   const [showPassword, setShowPassword] = useState(false);
+  const { login, isLoading, error, isAuthenticated } = useAuth();
 
-  const handleClick = () => {
-    router.push('/dashboard');
+  const handleClick = async () => {
+    await login(email, password);
+    if (error) showError(formatError(error));
   };
+
+  useEffect(() => {
+    if (isAuthenticated) router.push('/');
+  }, [isAuthenticated, router]);
 
   const renderForm = (
     <>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+        <TextField
+          name="email"
+          label="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
         <TextField
           name="password"
           label="Password"
           type={showPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -67,6 +92,7 @@ export default function LoginView() {
         variant="contained"
         color="inherit"
         onClick={handleClick}
+        disabled={isLoading}
       >
         Login
       </LoadingButton>
@@ -103,9 +129,9 @@ export default function LoginView() {
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
             Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
+            <NavLink variant="subtitle2" sx={{ ml: 0.5 }} to="/signup">
               Get started
-            </Link>
+            </NavLink>
           </Typography>
 
           <Stack direction="row" spacing={2}>
