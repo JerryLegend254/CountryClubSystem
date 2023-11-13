@@ -1,6 +1,8 @@
 import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -23,60 +25,77 @@ import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
+import FormRow from 'src/components/form/form-row';
 
-// eslint-disable-next-line import/no-cycle
-import { formatError } from '../signup/signup-view';
 
 // ----------------------------------------------------------------------
 
-export function showError(error) {
+export async function showError(error) {
   toast.error(error);
 }
 export default function LoginView() {
   const theme = useTheme();
 
   const router = useRouter();
-  const [email, setEmail] = useState('test2@dev.com');
-  const [password, setPassword] = useState('password');
 
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading, error, isAuthenticated } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
 
-  const handleClick = async () => {
-    await login(email, password);
-    if (error) showError(formatError(error));
-  };
+  // const handleClick = async () => {
+  //   await login(email, password);
+  //   if (error) await showError(formatError(error));
+  // };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const { mutate } = useMutation({
+    mutationFn: login,
+    onSuccess: () => {
+      toast.success('Logged in successfully');
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
   useEffect(() => {
     if (isAuthenticated) router.push('/');
   }, [isAuthenticated, router]);
 
+  async function onSubmit(data) {
+    mutate(data);
+  }
   const renderForm = (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <TextField
-          name="email"
-          label="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <FormRow error={errors?.email?.message}>
+          <TextField
+            name="email"
+            label="Email address"
+            type="email"
+            {...register('email', { required: 'The field is required' })}
+          />
+        </FormRow>
 
-        <TextField
-          name="password"
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <FormRow error={errors?.password?.message}>
+          <TextField
+            name="password"
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            {...register('password', { required: 'The field is required' })}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                    <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </FormRow>
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
@@ -91,12 +110,11 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
         disabled={isLoading}
       >
         Login
       </LoadingButton>
-    </>
+    </form>
   );
 
   return (

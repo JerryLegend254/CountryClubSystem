@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "yarn build --prefix CountryClubFE && npm run server",
+    "deploy": "npm run build --prefix CountryClubFE && npm run server",
     "start": "npm run server & npm run client",
     "server": "npm start --prefix CountryClubBE",
     "client": "npm run dev --prefix CountryClubFE",

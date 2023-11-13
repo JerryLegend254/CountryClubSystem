@@ -13,6 +13,7 @@ const {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  onAuthStateChanged,
 } = require("firebase/auth");
 const { initializeApp: adminInitApp, cert } = require("firebase-admin/app");
 const { initializeApp: clientInitApp } = require("firebase/app");
@@ -69,4 +70,5 @@ module.exports = {
   clientAuth,
   signInWithEmailAndPassword,
   signOut,
+  onAuthStateChanged,
 };

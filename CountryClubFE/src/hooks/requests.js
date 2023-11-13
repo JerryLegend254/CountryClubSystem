@@ -17,6 +17,10 @@ const API_URL = 'http://localhost:5000';
 //   }
 // }
 
+
+export async function httpGetCurrentUser() {
+  return fetch(`${API_URL}/auth/curruser`)
+}
 export async function httpEmailSignUp(credentails) {
   return fetch(`${API_URL}/auth/signup`, {
     method: 'POST',

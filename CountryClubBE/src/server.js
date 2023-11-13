@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const session = require("express-session")
 const path = require("path");
 const sgMail = require("@sendgrid/mail");
 const speakeasy = require("speakeasy");
@@ -24,18 +25,65 @@ app.use(
     origin: "http://localhost:3030",
   })
 );
-app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(
+  express.static(
+    path.join(__dirname, "..", "..", "CountryClubFE", "dist")
+  )
+);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
 
 const secretKey = speakeasy.generateSecret({ length: 20 });
 sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
 
 app.use("/auth", AuthRouter);
-app.get("/data", (req, res) => {
-  console.log("Data fetched");
-  res.status(200).json(data[0]);
-});
+
+
+
+
+// Middleware to handle authentication for each request
+async function authenticate (req, res, next){
+  const authToken = req.headers.authorization;
+  if (!authToken) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const user = await verifyAuthToken(authToken); // Implement this function to verify the auth token
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+
+// Example route that requires authentication
+// app.get('/api/currentUser', authenticate, (req, res) => {
+//   res.status(200).json({ user: req.user });
+// });
+
+// Function to verify the authentication token
+const verifyAuthToken = async (authToken) => {
+  return new Promise((resolve, reject) => {
+    onAuthStateChanged(clientAuth, (user) => {
+      if (user) {
+        // Check if the provided auth token matches the user's token
+        // This is a simplified example; in a real-world scenario, you would verify the token with Firebase Authentication
+        resolve(user);
+      } else {
+        reject(new Error('User not authenticated'));
+      }
+    });
+  });
+};
 
 // Send the OTP code via email using SendGrid
 app.post("/send-otp", (req, res) => {
@@ -81,7 +129,7 @@ app.post("/verify-otp", (req, res) => {
 });
 
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+  res.sendFile(path.join(__dirname, "..", "..", "CountryClubFE", "dist","index.html"));
 });
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

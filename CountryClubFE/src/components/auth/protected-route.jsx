@@ -5,9 +5,7 @@ import { useAuth } from 'src/hooks/use-auth';
 
 // eslint-disable-next-line react/prop-types
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, user } = useAuth();
-  console.log(isAuthenticated);
-  console.log(user)
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

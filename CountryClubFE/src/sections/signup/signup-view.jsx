@@ -1,5 +1,8 @@
+import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -22,88 +25,94 @@ import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
+import FormRow from 'src/components/form/form-row';
 
-// eslint-disable-next-line import/no-cycle
-import { showError } from '../login/login-view';
-
-// ----------------------------------------------------------------------
-
-
-export function formatError(error) {
-  return error.replace("Firebase: Error ", "")
-}
 export default function SignInView() {
   const theme = useTheme();
 
   const router = useRouter();
-  const [email, setEmail] = useState('jerryokuto@gmail.com');
-  const [username, setUsername] = useState('JerryLegend254');
-  const [password, setPassword] = useState('password');
-  const [confPass, setConfPass] = useState('password');
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
 
-  const { signup, error, isLoading, isAuthenticated } = useAuth();
+  const { signup, isLoading, isAuthenticated } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+  } = useForm();
 
-  const handleClick = async () => {
-    await signup(email, username, password, confPass);
-    if (error) showError(formatError(error));
-  };
-
+  const { mutate } = useMutation({
+    mutationFn: signup,
+    onSuccess: () => {
+      toast.success('User was created successfully');
+    },
+    onError: (err) => toast.error(err.message),
+  });
   useEffect(() => {
     if (isAuthenticated) router.push('/');
   }, [isAuthenticated, router]);
 
+  async function onSubmit(data) {
+    mutate(data);
+  }
 
   const renderForm = (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <TextField
-          name="email"
-          label="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          name="username"
-          label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-
-        <TextField
-          name="password"
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <TextField
-          name="conf_password"
-          label="Confirm Password"
-          type={showConfPassword ? 'text' : 'password'}
-          value={confPass}
-          onChange={(e) => setConfPass(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowConfPassword(!showConfPassword)} edge="end">
-                  <Iconify icon={showConfPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <FormRow error={errors?.email?.message}>
+          <TextField
+            name="email"
+            label="Email address"
+            type="email"
+            {...register('email', { required: 'The field is required' })}
+          />
+        </FormRow>
+        <FormRow error={errors?.username?.message}>
+          <TextField
+            name="username"
+            label="Username"
+            {...register('username', { required: 'The field is required' })}
+          />
+        </FormRow>
+        <FormRow error={errors?.password?.message}>
+          <TextField
+            name="password"
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            {...register('password', { required: 'The field is required' })}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                    <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </FormRow>
+        <FormRow error={errors?.confPass?.message}>
+          <TextField
+            name="conf_password"
+            label="Confirm Password"
+            type={showConfPassword ? 'text' : 'password'}
+            {...register('confPass', {
+              required: 'The field is required',
+              validate: (value) => value === getValues().password || 'Password do not match',
+            })}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowConfPassword(!showConfPassword)} edge="end">
+                    <Iconify icon={showConfPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </FormRow>
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
@@ -118,12 +127,12 @@ export default function SignInView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        // onClick={handleClick}
         disabled={isLoading}
       >
         Sign Up
       </LoadingButton>
-    </>
+    </form>
   );
 
   return (

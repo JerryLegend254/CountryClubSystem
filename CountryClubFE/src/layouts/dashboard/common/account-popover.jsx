@@ -1,6 +1,5 @@
 import { useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { useQuery } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -12,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import { useAuth } from 'src/hooks/use-auth';
-
 
 // import { account } from 'src/_mock/account';
 
@@ -36,17 +34,7 @@ const MENU_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
- const { isPending, error, data: account } = useQuery({
-   queryKey: ['userData'],
-   queryFn: async () => {
-     const res = await fetch('http://localhost:5000/data');
-     
-     const datum = await res.json();
-     console.log(datum)
-     return datum;
-   },
- });
-  const {logout} = useAuth()
+  const {user: account, logout} = useAuth()
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
@@ -61,10 +49,6 @@ export default function AccountPopover() {
     logout()
   };
 
-
-   if (isPending) return 'Loading...';
-
-   if (error) return `An error has occurred:   ${error.message}`;
 
   return (
     <>

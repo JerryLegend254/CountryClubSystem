@@ -1,62 +1,84 @@
 import PropTypes from 'prop-types';
-import { useState, useContext, createContext } from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
 
-import { httpSignOut, httpEmailSignIn, httpEmailSignUp } from './requests';
+import {
+  auth,
+  signOut,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+} from 'src/services/firebase/index';
+
+import { httpEmailSignUp } from './requests';
 
 const AuthContext = createContext();
 
+function formatFirebaseError(error) {
+  let formattedError = error.replace('Firebase: Error ', '');
+  formattedError = formattedError.replace(/[()]/g, '').trim();
+  formattedError = formattedError.charAt(0).toUpperCase() + formattedError.slice(1);
+
+  return formattedError;
+}
 function AuthContextProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  async function signup(email, username, password, confPassword) {
-    if (password !== confPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+  useEffect(() => {
+    onAuthStateChanged(auth, (userCred) => {
+      setIsLoading(true)
+      if (userCred) {
+        setUser(userCred);
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false)
+    });
+  }, [user]);
+
+  async function signup({ email, username, password }) {
     try {
-      setError('');
+      console.log('Starting su operation');
       setIsLoading(true);
-      const res = await httpEmailSignUp({ email, password, username});
+      const res = await httpEmailSignUp({ email, password, username });
       const parsedRes = await res.json();
       setUser(parsedRes?.user);
-      setError(parsedRes?.error);
+      if (parsedRes?.error) throw new Error(formatFirebaseError(parsedRes.error));
     } catch (err) {
-      setError(err.message);
+      throw new Error(err.message);
     } finally {
       setIsLoading(false);
     }
   }
-  async function login(email, password) {
+  async function login({ email, password }) {
+
     try {
-      setError('');
       setIsLoading(true);
-      const res = await httpEmailSignIn({ email, password });
-      const parsedRes = await res.json();
-      setUser(parsedRes?.user);
-      setError(parsedRes?.error);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setUser(userCredential?.user);
     } catch (err) {
-      setError(err.message);
+      throw new Error(formatFirebaseError(err.message)) ;
     } finally {
       setIsLoading(false);
     }
   }
 
   async function logout() {
-    try {
-      await httpSignOut();
-      setUser(null);
-    } catch (err) {
-      setError(err);
-    }
+    setIsLoading(true);
+    await signOut(auth);
+    setIsLoading(false);
   }
-
-
+ 
   return (
     <AuthContext.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
-      value={{ user, isAuthenticated: !!user, login, logout, isLoading, error, signup, setError }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        login,
+        logout,
+        isLoading,
+        signup,
+      }}
     >
       {children}
     </AuthContext.Provider>

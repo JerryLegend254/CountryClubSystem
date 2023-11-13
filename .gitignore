@@ -1,5 +1,5 @@
 node_modules
 .env
 city.modeyl.js
-public
 firebase-adm-sdk.json
+/dist
