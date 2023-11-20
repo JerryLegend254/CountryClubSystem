@@ -1,13 +1,13 @@
 // const { initializeApp } = require("firebase/app");
-// const {
-//   getFirestore,
-//   doc,
-//   setDoc,
-//   collection,
-//   addDoc,
-//   query,
-//   getDocs,
-// } = require("firebase/firestore");
+const {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  addDoc,
+  query,
+  getDocs,
+} = require("firebase/firestore");
 const {
   getAuth: getClientAuth,
   signInWithEmailAndPassword,
@@ -21,23 +21,14 @@ const { getAuth: getAdminAuth } = require("firebase-admin/auth");
 
 const serviceAccount = require("./firebase-adm-sdk.json");
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyBj16t-OXZtQlDKo5AWA4mr-QmKghLcF4E",
-//   authDomain: "country-club-3daf4.firebaseapp.com",
-//   projectId: "country-club-3daf4",
-//   storageBucket: "country-club-3daf4.appspot.com",
-//   messagingSenderId: "965270852130",
-//   appId: "1:965270852130:web:6c9d552e29945e06d8307b",
-//   measurementId: "G-E0GJQRD7ME",
-// };
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBDdY0Gewxa32VB0tycpnKylu705KDdzYk",
-  authDomain: "countryclubsystem.firebaseapp.com",
-  projectId: "countryclubsystem",
-  storageBucket: "countryclubsystem.appspot.com",
-  messagingSenderId: "1063370598366",
-  appId: "1:1063370598366:web:00b05aa719ed6aebbfdf4f",
+  apiKey: "AIzaSyDwKn8_iosdgqR03fYUWwNaGUIBsd4lO4c",
+  authDomain: "country-club-2974d.firebaseapp.com",
+  projectId: "country-club-2974d",
+  storageBucket: "country-club-2974d.appspot.com",
+  messagingSenderId: "261000815470",
+  appId: "1:261000815470:web:0f6533fd278170d6c6977f",
+  measurementId: "G-NL6H1HEDBM",
 };
 
 const adminApp = adminInitApp({
@@ -48,7 +39,7 @@ const adminApp = adminInitApp({
 const clientApp = clientInitApp(firebaseConfig);
 const adminAuth = getAdminAuth(adminApp);
 const clientAuth = getClientAuth(clientApp);
-// const db = getFirestore(app);
+const db = getFirestore(clientApp);
 
 // module.exports = {
 //   doc,
@@ -71,4 +62,8 @@ module.exports = {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  doc,
+  collection,
+  db,
+  setDoc
 };

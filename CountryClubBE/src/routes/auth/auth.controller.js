@@ -1,13 +1,11 @@
 const {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   adminAuth,
   clientAuth,
-  signOut,
-  updateProfile,
-  onAuthStateChanged,
+  db,
+  setDoc,
+  doc
 } = require("../../firebase/index");
-
 
 async function httpEmailSignUp(req, res) {
   try {
@@ -21,20 +19,21 @@ async function httpEmailSignUp(req, res) {
       disabled: false,
     });
 
-    const additionalClaims = {
-      email: userRecord.email,
-      displayName: userRecord.displayName,
-      photoURL: userRecord.photoURL,
-    };
-    const customToken = await adminAuth.createCustomToken(
-      userRecord.uid,
-      additionalClaims
-    );
+    // const additionalClaims = {
+    //   email: userRecord.email,
+    //   displayName: userRecord.displayName,
+    //   photoURL: userRecord.photoURL,
+    // };
+    // const customToken = await adminAuth.createCustomToken(
+    //   userRecord.uid,
+    //   additionalClaims
+    // );
 
-    res.cookie("session", customToken, { httpOnly: true });
-    return res
-      .status(201)
-      .json({ msg: "User created successfully", user: customToken });
+    // Assign a role to the user
+    const role = "user"; // Set the default role or determine it based on your logic
+    await setDoc(doc(db, "userRoles", userRecord.uid), { role });
+
+    return res.status(201).json({ msg: "User created successfully" });
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -59,32 +58,29 @@ async function httpEmailSignUp(req, res) {
 //     });
 // }
 
-async function httpEmailSignIn(req, res) {
-  const { email, password } = req.body;
+// async function httpEmailSignIn(req, res) {
+//   const { email, password } = req.body;
 
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      clientAuth,
-      email,
-      password
-    );
-    const user = userCredential.user;
+//   try {
+//     const userCredential = await signInWithEmailAndPassword(
+//       clientAuth,
+//       email,
+//       password
+//     );
+//     const user = userCredential.user;
 
-    // Set session cookie
-    const idToken = await user.getIdToken();
+//     // Set session cookie
+//     const idToken = await user.getIdToken();
 
-
-    req.session.token = idToken
-    console.log(req.session.token);
-    res.status(200).json({ msg: "Signed In", user });
-  } catch (error) {
-    const errorMessage = error.message;
-    res.status(404).json({ error: errorMessage });
-  }
-}
-
-
+//     req.session.token = idToken;
+//     console.log(req.session.token);
+//     res.status(200).json({ msg: "Signed In", user });
+//   } catch (error) {
+//     const errorMessage = error.message;
+//     res.status(404).json({ error: errorMessage });
+//   }
+// }
 
 module.exports = {
-  httpEmailSignUp
+  httpEmailSignUp,
 };
