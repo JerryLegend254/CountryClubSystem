@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "install server": "npm install --prefix CountryClubBE",
+    "install client": "yarn add --prefix CountryClubFE",
+    "install": "npm run install client && npm run server",
     "deploy": "npm run build --prefix CountryClubFE && npm run server",
     "start": "npm run server & npm run client",
     "server": "npm start --prefix CountryClubBE",
