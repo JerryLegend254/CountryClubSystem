@@ -58,6 +58,10 @@ export default function SignInView() {
     mutate(data);
   }
 
+  const handleGoogleSignup = () => {
+
+    console.log("Google")
+  }
   const renderForm = (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
@@ -177,6 +181,7 @@ export default function SignInView() {
               color="inherit"
               variant="outlined"
               sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
+              onClick={handleGoogleSignup}
             >
               <Iconify icon="eva:google-fill" color="#DF3E30" />
             </Button>
