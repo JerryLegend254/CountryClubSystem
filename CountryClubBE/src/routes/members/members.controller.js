@@ -1,5 +1,5 @@
 const { UserRecord } = require("firebase-admin/auth");
-const { getDocs, collection, getDoc, query } = require("firebase/firestore");
+const { getDocs, collection, getDoc, query, doc } = require("firebase/firestore");
 const { db } = require("../../firebase");
 
 async function httpGetAllMembers(req, res) {
@@ -25,7 +25,7 @@ async function httpGetAllMembers(req, res) {
 async function httpGetOneMember(req, res) {
     try {
         console.log(req)
-        const memberId = req.params.UserRecord.uid
+        const memberId = req.params.id
         const docRef = doc(db, "members", memberId);
         const docSnap = await getDoc(docRef);
         
