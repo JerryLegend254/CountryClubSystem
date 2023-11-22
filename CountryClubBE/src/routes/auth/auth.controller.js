@@ -58,7 +58,7 @@ async function httpEmailSignUp(req, res) {
 //     });
 // }
 
-// async function httpEmailSignIn(req, res) {
+//   async function httpEmailSignIn(req, res) {
 //   const { email, password } = req.body;
 
 //   try {
