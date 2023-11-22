@@ -32,7 +32,13 @@ async function httpEmailSignUp(req, res) {
     // Assign a role to the user
     const role = "User"; // Set the default role or determine it based on your logic
     await setDoc(doc(db, "userRoles", userRecord.uid), { role });
+    console.log(userRecord)
 
+    // mEMBERS
+    await setDoc(doc(db, "members", userRecord.uid), {
+      username: userRecord.displayName,
+      email: userRecord.email,
+    });
     return res.status(201).json({ msg: "User created successfully" });
   } catch (err) {
     return res.status(400).json({ error: err.message });
