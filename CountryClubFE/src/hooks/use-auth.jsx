@@ -2,7 +2,10 @@ import PropTypes from 'prop-types';
 import { useState, useEffect, useContext, createContext } from 'react';
 
 import {
+  db,
+  doc,
   auth,
+  getDoc,
   signOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -21,17 +24,24 @@ function formatFirebaseError(error) {
 }
 function AuthContextProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (userCred) => {
-      setIsLoading(true)
+    onAuthStateChanged(auth, async (userCred) => {
+      setIsLoading(true);
       if (userCred) {
-        setUser(userCred);
+        const docRef = doc(db, 'userRoles', userCred.uid);
+        const docSnap = await getDoc(docRef);
+        const { role } = docSnap.data();
+
+        if (docSnap.exists()) {
+          setUser({ ...userCred, role });
+        }
       } else {
         setUser(null);
       }
-      setIsLoading(false)
+      setIsLoading(false);
     });
   }, [user]);
 
@@ -41,7 +51,6 @@ function AuthContextProvider({ children }) {
       setIsLoading(true);
       const res = await httpEmailSignUp({ email, password, username });
       const parsedRes = await res.json();
-      setUser(parsedRes?.user);
       if (parsedRes?.error) throw new Error(formatFirebaseError(parsedRes.error));
     } catch (err) {
       throw new Error(err.message);
@@ -50,13 +59,19 @@ function AuthContextProvider({ children }) {
     }
   }
   async function login({ email, password }) {
-
     try {
       setIsLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      setUser(userCredential?.user);
+      if (userCredential?.user) {
+        const userId = userCredential.user.uid;
+        const docRef = doc(db, 'userRoles', userId);
+        const docSnap = await getDoc(docRef);
+        const { role } = docSnap.data();
+
+        setUser({ ...userCredential?.user, role });
+      }
     } catch (err) {
-      throw new Error(formatFirebaseError(err.message)) ;
+      throw new Error(formatFirebaseError(err.message));
     } finally {
       setIsLoading(false);
     }
@@ -65,9 +80,10 @@ function AuthContextProvider({ children }) {
   async function logout() {
     setIsLoading(true);
     await signOut(auth);
+    setUserRole(null);
     setIsLoading(false);
   }
- 
+
   return (
     <AuthContext.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
@@ -78,6 +94,7 @@ function AuthContextProvider({ children }) {
         logout,
         isLoading,
         signup,
+        userRole,
       }}
     >
       {children}

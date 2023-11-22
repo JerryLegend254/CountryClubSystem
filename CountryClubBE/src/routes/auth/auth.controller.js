@@ -4,7 +4,7 @@ const {
   clientAuth,
   db,
   setDoc,
-  doc
+  doc,
 } = require("../../firebase/index");
 
 async function httpEmailSignUp(req, res) {
@@ -30,7 +30,7 @@ async function httpEmailSignUp(req, res) {
     // );
 
     // Assign a role to the user
-    const role = "user"; // Set the default role or determine it based on your logic
+    const role = "User"; // Set the default role or determine it based on your logic
     await setDoc(doc(db, "userRoles", userRecord.uid), { role });
 
     return res.status(201).json({ msg: "User created successfully" });
@@ -58,7 +58,7 @@ async function httpEmailSignUp(req, res) {
 //     });
 // }
 
-//   async function httpEmailSignIn(req, res) {
+// async function httpEmailSignIn(req, res) {
 //   const { email, password } = req.body;
 
 //   try {

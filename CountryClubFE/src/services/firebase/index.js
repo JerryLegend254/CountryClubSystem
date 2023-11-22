@@ -1,16 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // const { initializeApp } = require("firebase/app");
-// const {
-//   getFirestore,
-//   doc,
-//   setDoc,
-//   collection,
-//   addDoc,
-//   query,
-//   getDocs,
-// } = require("firebase/firestore");
+
+// doc,
+// setDoc,
+// collection,
+// addDoc,
+// query,
+// getDocs,
 import { initializeApp } from 'firebase/app';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { getAuth, signOut, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -25,7 +23,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// const db = getFirestore(app);
+const db = getFirestore(app);
 
-
-export { auth, signOut, onAuthStateChanged, signInWithEmailAndPassword };
+export { db, doc, auth, getDoc, signOut, onAuthStateChanged, signInWithEmailAndPassword };

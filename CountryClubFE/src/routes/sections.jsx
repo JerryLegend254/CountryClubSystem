@@ -1,10 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
+import Userpage from 'src/pages/userpage';
 import DashboardLayout from 'src/layouts/dashboard';
 
 import ProtectedRoute from 'src/components/auth/protected-route';
-
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
@@ -35,10 +35,25 @@ export default function Router() {
         { path: 'blog', element: <BlogPage /> },
       ],
     },
+
+    {
+      element: (
+        <ProtectedRoute>
+          <Outlet />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: 'userpage',
+          element: <Userpage />,
+        },
+      ],
+    },
     {
       path: 'login',
       element: <LoginPage />,
     },
+
     {
       path: 'signup',
       element: <SignUpPage />,
