@@ -7,6 +7,7 @@ const sgMail = require("@sendgrid/mail");
 const speakeasy = require("speakeasy");
 const AuthRouter = require("./routes/auth/auth.routes");
 const SportsplanRouter = require("./routes/sportsplan/sportsplan.route");
+const PaymentRouter = require("./routes/payments/payment.routes");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 8000;
@@ -47,6 +48,7 @@ sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
 
 app.use("/auth", AuthRouter);
 app.use("/sportsplan", SportsplanRouter);
+app.use("/payment", PaymentRouter);
 
 
 
