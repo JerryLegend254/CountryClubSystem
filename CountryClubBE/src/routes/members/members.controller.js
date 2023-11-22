@@ -25,8 +25,8 @@ async function httpGetAllMembers(req, res) {
 async function httpGetOneMember(req, res) {
     try {
         console.log(req)
-        const sportsplanId = req.params.id
-        const docRef = doc(db, "members", sportsplanId);
+        const memberId = req.params.UserRecord.uid
+        const docRef = doc(db, "members", memberId);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
