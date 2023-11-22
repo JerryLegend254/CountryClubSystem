@@ -1,0 +1,3 @@
+function httpCreateMember(req, res){
+    
+}
