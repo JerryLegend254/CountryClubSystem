@@ -2,10 +2,7 @@ import PropTypes from 'prop-types';
 import { useState, useEffect, useContext, createContext } from 'react';
 
 import {
-  db,
-  doc,
   auth,
-  getDoc,
   signOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -24,27 +21,18 @@ function formatFirebaseError(error) {
 }
 function AuthContextProvider({ children }) {
   const [user, setUser] = useState(auth.currentUser);
-  const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     onAuthStateChanged(auth, async (userCred) => {
-  //       if (userCred) {
-  //         const docRef = doc(db, 'userRoles', userCred.uid);
-  //         const docSnap = await getDoc(docRef);
-  //         const { role } = docSnap.data();
-
-  //         if (docSnap.exists()) {
-  //           setUser({ ...userCred, role });
-  //         }
-  //         console.log("User")
-  //       } else {
-  //         setUser(null);
-  //       }
-  //     });
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    onAuthStateChanged(auth, async (userCred) => {
+      if (userCred) {
+        setUser(userCred);
+        console.log('User');
+      } else {
+        setUser(null);
+      }
+    });
+  }, [user]);
 
   // useEffect(() => {
   //   let unsubscribe; // Declare a variable to store the unsubscribe function
@@ -53,14 +41,8 @@ function AuthContextProvider({ children }) {
   //     // Add the listener and store the unsubscribe function
   //     unsubscribe = onAuthStateChanged(auth, async (userCred) => {
   //       if (userCred) {
-  //         const docRef = doc(db, 'userRoles', userCred.uid);
-  //         const docSnap = await getDoc(docRef);
-  //         const { role } = docSnap.data();
-
-  //         if (docSnap.exists()) {
-  //           setUser({ ...userCred, role });
-  //         }
-  //         console.log('User');
+  //         setUser(userCred);
+  //         console.log("User")
   //       } else {
   //         setUser(null);
   //       }
@@ -74,16 +56,6 @@ function AuthContextProvider({ children }) {
   //     }
   //   };
   // }, [user]);
-  // const user = auth.currentUser;
-
-  // useEffect(() => {if (user !== null) {
-  //   const {displayName, email, photoURL, emailVerified, uid} = user
-
-  //   setUser({displayName, email, photoURL, emailVerified, uid})
-  // }}, [user])
-  
-
-
   async function signup({ email, username, password }) {
     try {
       console.log('Starting su operation');
@@ -91,6 +63,7 @@ function AuthContextProvider({ children }) {
       const res = await httpEmailSignUp({ email, password, username });
       const parsedRes = await res.json();
       if (parsedRes?.error) throw new Error(formatFirebaseError(parsedRes.error));
+      setUser(parsedRes?.user);
     } catch (err) {
       throw new Error(err.message);
     } finally {
@@ -102,12 +75,7 @@ function AuthContextProvider({ children }) {
       setIsLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (userCredential?.user) {
-        const userId = userCredential.user.uid;
-        const docRef = doc(db, 'userRoles', userId);
-        const docSnap = await getDoc(docRef);
-        const { role } = docSnap.data();
-
-        setUser({ ...userCredential?.user, role });
+        setUser(userCredential?.user);
       }
     } catch (err) {
       throw new Error(formatFirebaseError(err.message));
@@ -119,8 +87,7 @@ function AuthContextProvider({ children }) {
   async function logout() {
     setIsLoading(true);
     await signOut(auth);
-    setUser(null)
-    setUserRole(null);
+    setUser(null);
     setIsLoading(false);
   }
 
@@ -134,7 +101,6 @@ function AuthContextProvider({ children }) {
         logout,
         isLoading,
         signup,
-        userRole,
       }}
     >
       {children}

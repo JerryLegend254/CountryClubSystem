@@ -1,4 +1,3 @@
-import {  useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
@@ -6,13 +5,12 @@ import { useMutation } from '@tanstack/react-query';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
+import { Container } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
-
-import { useRouter } from 'src/routes/hooks';
 
 import { useAuth } from 'src/hooks/use-auth';
 
@@ -21,13 +19,12 @@ import { bgGradient } from 'src/theme/css';
 import Logo from 'src/components/logo';
 import FormRow from 'src/components/form/form-row';
 
-export default function SignInView() {
+export default function AddPlanView() {
   const theme = useTheme();
 
-  const router = useRouter();
 
 
-  const { signup, isLoading, isAuthenticated } = useAuth();
+  const { signup, isLoading } = useAuth();
   const {
     register,
     handleSubmit,
@@ -41,10 +38,6 @@ export default function SignInView() {
     },
     onError: (err) => toast.error(err.message),
   });
-  useEffect(() => {
-    if (isAuthenticated) router.push('/');
-  }, [isAuthenticated, router]);
-
   async function onSubmit(data) {
     mutate(data);
   }
@@ -87,38 +80,43 @@ export default function SignInView() {
   );
 
   return (
-    <Box
-      sx={{
-        ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
-          imgUrl: '/assets/background/overlay_4.jpg',
-        }),
-        height: 1,
-      }}
-    >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
-
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
-        <Card
-          sx={{
-            p: 5,
-            width: 1,
-            maxWidth: 420,
-          }}
-        >
-          <Typography variant="h4">Add Plan</Typography>
-
-          <Divider sx={{ my: 3 }} />
-
-          {renderForm}
-        </Card>
+    <Container>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Typography variant="h4">Sports plan</Typography>
       </Stack>
-    </Box>
+      <Box
+        sx={{
+          ...bgGradient({
+            color: alpha(theme.palette.background.default, 0.9),
+            imgUrl: '/assets/background/overlay_4.jpg',
+          }),
+          height: 1,
+        }}
+      >
+        <Logo
+          sx={{
+            position: 'fixed',
+            top: { xs: 16, md: 24 },
+            left: { xs: 16, md: 24 },
+          }}
+        />
+
+        <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+          <Card
+            sx={{
+              p: 5,
+              width: 1,
+              maxWidth: 420,
+            }}
+          >
+            <Typography variant="h4">Add Plan</Typography>
+
+            <Divider sx={{ my: 3 }} />
+
+            {renderForm}
+          </Card>
+        </Stack>
+      </Box>
+    </Container>
   );
 }

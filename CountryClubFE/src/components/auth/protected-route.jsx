@@ -11,7 +11,7 @@ function ProtectedRoute({ children }) {
   useEffect(() => {
     if (!isAuthenticated) navigate('/login');
     if (user) {
-      if (user.role === 'User') navigate('/userpage');
+      if (user.email !== 'admin@gmail.com') navigate('/userpage');
     }
   }, [isAuthenticated, navigate, user]);
 

@@ -35,7 +35,7 @@ export default function Router() {
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         {
-          path: 'create-plan',
+          path: 'addplan',
           element: <AddPlanPage />,
         },
       ],

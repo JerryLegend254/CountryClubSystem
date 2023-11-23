@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-import { AddPlanView } from '../sections/add-plan';
+import { AddPlanView } from '../sections/add-plan/view';
 
 // ----------------------------------------------------------------------
 
