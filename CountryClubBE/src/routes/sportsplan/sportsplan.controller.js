@@ -1,4 +1,4 @@
-const { addDoc, collection, query, getDocs, getDoc, doc } = require("firebase/firestore");
+const { addDoc, collection, query, getDocs, getDoc, doc, deleteDoc, updateDoc } = require("firebase/firestore");
 const { db } = require("../../firebase");
 
 async function httpAddSportsplan(req, res) {
@@ -22,7 +22,7 @@ async function httpGetAllSportsplan(req, res) {
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             console.log(doc.id, " => ", doc.data());
-            sportsplans.push({id: doc.id, ...doc.data()})
+            sportsplans.push({ id: doc.id, ...doc.data() })
         });
 
         return res.status(200).json(sportsplans)
@@ -40,18 +40,18 @@ async function httpGetOneSportsplan(req, res) {
         const sportsplanId = req.params.id
         const docRef = doc(db, "sportsplan", sportsplanId);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
-          console.log("Document data:", docSnap.data());
-          const data = docSnap.data()
-          console.log("Found Document")
-          return res.status(200).json(data)
+            console.log("Document data:", docSnap.data());
+            const data = docSnap.data()
+            console.log("Found Document")
+            return res.status(200).json(data)
         } else {
-          // docSnap.data() will be undefined in this case
-          return res.status(404).json({ msg: "Document not found" })
+            // docSnap.data() will be undefined in this case
+            return res.status(404).json({ msg: "Document not found" })
         }
 
-        
+
     } catch (err) {
 
         return res.status(400).json({ msg: err })
@@ -59,7 +59,50 @@ async function httpGetOneSportsplan(req, res) {
 
 }
 
+async function httpDeleteSportsplan(req, res) {
+    try {
+        const sportsplanId = req.params.id;
+        if (!sportsplanId) {
+            return res.status(400).json({ msg: "Invalid Id" });
+        }
+        const docRef = doc(db, "sportsplan", sportsplanId);
+
+        const docSnapshot = await getDoc(docRef);
+        if (!docSnapshot.exists()) {
+            return res.status(404).json({ msg: "Sportsplan not found" })
+        }
+        await deleteDoc(docRef);
+        return res.status(200).json({ msg: "Deleted" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ msg: "Internal server error" })
+    }
+
+}
+async function httpUpdateSportsplan(req, res) {
+    try {
+        const sportsplanId = req.params.id
+        const sportsplan = req.body
+        const docRef = doc(db, "sportsplan", sportsplanId);
+
+        const userChange = await getDoc(docRef);
+        if (userChange.exists()) {
+            await updateDoc(docRef, sportsplan);
+            return res.status(200).json({ msg: "Updated" });
+        } else {
+            return res.status(404).json("Could not find the Record");
+        }
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ msg: "Server error" });
+    }
+
+
+
+}
+
 
 module.exports = {
-    httpAddSportsplan, httpGetAllSportsplan, httpGetOneSportsplan
+    httpAddSportsplan, httpGetAllSportsplan, httpGetOneSportsplan, httpDeleteSportsplan, httpUpdateSportsplan
 }
