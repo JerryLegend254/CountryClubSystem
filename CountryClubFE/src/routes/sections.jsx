@@ -1,7 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
-import Userpage from 'src/pages/userpage';
+import AddPlanPage from 'src/pages/add-plan';
+import UserLayout from 'src/layouts/user-dashboard';
 import DashboardLayout from 'src/layouts/dashboard';
 
 import ProtectedRoute from 'src/components/auth/protected-route';
@@ -33,19 +34,25 @@ export default function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        {
+          path: 'create-plan',
+          element: <AddPlanPage />,
+        },
       ],
     },
 
     {
       element: (
         <ProtectedRoute>
-          <Outlet />
+          <UserLayout>
+            <Outlet />
+          </UserLayout>
         </ProtectedRoute>
       ),
       children: [
         {
           path: 'userpage',
-          element: <Userpage />,
+          element: <AddPlanPage />,
         },
       ],
     },

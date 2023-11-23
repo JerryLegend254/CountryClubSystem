@@ -23,27 +23,66 @@ function formatFirebaseError(error) {
   return formattedError;
 }
 function AuthContextProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(auth.currentUser);
   const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, async (userCred) => {
-      setIsLoading(true);
-      if (userCred) {
-        const docRef = doc(db, 'userRoles', userCred.uid);
-        const docSnap = await getDoc(docRef);
-        const { role } = docSnap.data();
+  // useEffect(() => {
+  //   if (user) {
+  //     onAuthStateChanged(auth, async (userCred) => {
+  //       if (userCred) {
+  //         const docRef = doc(db, 'userRoles', userCred.uid);
+  //         const docSnap = await getDoc(docRef);
+  //         const { role } = docSnap.data();
 
-        if (docSnap.exists()) {
-          setUser({ ...userCred, role });
-        }
-      } else {
-        setUser(null);
-      }
-      setIsLoading(false);
-    });
-  }, [user]);
+  //         if (docSnap.exists()) {
+  //           setUser({ ...userCred, role });
+  //         }
+  //         console.log("User")
+  //       } else {
+  //         setUser(null);
+  //       }
+  //     });
+  //   }
+  // }, [user]);
+
+  // useEffect(() => {
+  //   let unsubscribe; // Declare a variable to store the unsubscribe function
+
+  //   if (user) {
+  //     // Add the listener and store the unsubscribe function
+  //     unsubscribe = onAuthStateChanged(auth, async (userCred) => {
+  //       if (userCred) {
+  //         const docRef = doc(db, 'userRoles', userCred.uid);
+  //         const docSnap = await getDoc(docRef);
+  //         const { role } = docSnap.data();
+
+  //         if (docSnap.exists()) {
+  //           setUser({ ...userCred, role });
+  //         }
+  //         console.log('User');
+  //       } else {
+  //         setUser(null);
+  //       }
+  //     });
+  //   }
+
+  //   // Return the cleanup function to unsubscribe the listener
+  //   return () => {
+  //     if (unsubscribe) {
+  //       unsubscribe();
+  //     }
+  //   };
+  // }, [user]);
+  // const user = auth.currentUser;
+
+  // useEffect(() => {if (user !== null) {
+  //   const {displayName, email, photoURL, emailVerified, uid} = user
+
+  //   setUser({displayName, email, photoURL, emailVerified, uid})
+  // }}, [user])
+  
+
 
   async function signup({ email, username, password }) {
     try {
@@ -80,6 +119,7 @@ function AuthContextProvider({ children }) {
   async function logout() {
     setIsLoading(true);
     await signOut(auth);
+    setUser(null)
     setUserRole(null);
     setIsLoading(false);
   }

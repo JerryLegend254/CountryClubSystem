@@ -18,9 +18,6 @@ const API_URL = 'http://localhost:8000';
 // }
 
 
-export async function httpGetCurrentUser() {
-  return fetch(`${API_URL}/auth/curruser`)
-}
 export async function httpEmailSignUp(credentails) {
   return fetch(`${API_URL}/auth/signup`, {
     method: 'POST',
@@ -31,16 +28,6 @@ export async function httpEmailSignUp(credentails) {
   });
 }
 
-export async function httpEmailSignIn(credentails) {
-  return fetch(`${API_URL}/auth/signin`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentails),
-  });
-}
-
-export async function httpSignOut() {
-  return fetch(`${API_URL}/auth/signout`)
+export async function httpGetAllSportsplans() {
+  return fetch(`${API_URL}/sportsplan`)
 }
