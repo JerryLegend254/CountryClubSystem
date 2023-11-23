@@ -60,23 +60,24 @@ async function httpGetOneSportsplan(req, res) {
 }
 
 async function httpDeleteSportsplan(req, res) {
-    try {
-        const sportsplanId = req.params.id;
-        if (!sportsplanId) {
-            return res.status(400).json({ msg: "Invalid Id" });
+    try{
+        const id = req.params.id;
+        const removeUser=  doc(db, "sportsplan", id);
+        
+        const snapshot = await getDoc(removeUser);
+        
+        if(snapshot.exists()){
+            await deleteDoc(removeUser, id);
+            return res.status(200).json("Deleted a record");
+    
         }
-        const docRef = doc(db, "sportsplan", sportsplanId);
-
-        const docSnapshot = await getDoc(docRef);
-        if (!docSnapshot.exists()) {
-            return res.status(404).json({ msg: "Sportsplan not found" })
-        }
-        await deleteDoc(docRef);
-        return res.status(200).json({ msg: "Deleted" });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ msg: "Internal server error" })
-    }
+        else{
+            return res.status(404).json("Document not found");
+    
+          }
+      }catch(error){
+          console.error(error);
+      }
 
 }
 async function httpUpdateSportsplan(req, res) {
