@@ -32,7 +32,7 @@ async function httpEmailSignUp(req, res) {
     // Assign a role to the user
     const role = "User"; // Set the default role or determine it based on your logic
     await setDoc(doc(db, "userRoles", userRecord.uid), { role });
-    console.log(userRecord)
+    console.log(userRecord);
 
     // mEMBERS
     await setDoc(doc(db, "members", userRecord.uid), {
@@ -44,6 +44,79 @@ async function httpEmailSignUp(req, res) {
     return res.status(400).json({ error: err.message });
   }
 }
+
+// async function httpGetAllUsers(req, res) {
+//   const members = [];
+
+//   function listAllUsers(nextPageToken) {
+//     // List batch of users, 1000 at a time.
+//     adminAuth
+//       .listUsers(1000, nextPageToken)
+//       .then((listUsersResult) => {
+//         listUsersResult.users.forEach((userRecord) => {
+//           // console.log("user", userRecord.toJSON());
+//           members.push(userRecord.toJSON());
+//         });
+//         if (listUsersResult.pageToken) {
+//           // List next batch of users.
+//           listAllUsers(listUsersResult.pageToken);
+//         }
+//         // console.log(members);
+//         return members
+//       })
+//       .catch((error) => {
+//         console.log("Error listing users:", error);
+//         return error;
+//       });
+//   }
+//   try {
+//     const membersList = listAllUsers();
+//     return await res.status(200).json(membersList);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ error: err });
+//   }
+// }
+
+
+async function httpGetAllUsers(req, res) {
+  const members = [];
+
+  async function listAllUsers(nextPageToken) {
+    try {
+      // List batch of users, 1000 at a time.
+      const listUsersResult = await adminAuth.listUsers(1000, nextPageToken);
+
+      listUsersResult.users.forEach((userRecord) => {
+
+        const {uid, displayName, email, emailVerified, disabled, photoURL} = userRecord.toJSON();
+        members.push({uid, disabled, name: displayName, email, emailVerified, photoURL})
+      });
+
+      if (listUsersResult.pageToken) {
+        // List next batch of users.
+        await listAllUsers(listUsersResult.pageToken);
+      }
+
+      return members;
+    } catch (error) {
+      console.log("Error listing users:", error);
+      throw error;
+    }
+  }
+
+  try {
+    const membersList = await listAllUsers();
+    return res.status(200).json(membersList);
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ error: err.message || "Internal Server Error" });
+  }
+}
+
+
 // async function httpEmailSignIn(req, res) {
 //   const { email, password } = req.body;
 //   signInWithEmailAndPassword(clientAuth, email, password)
@@ -89,4 +162,5 @@ async function httpEmailSignUp(req, res) {
 
 module.exports = {
   httpEmailSignUp,
+  httpGetAllUsers,
 };
