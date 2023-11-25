@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { useMembers } from 'src/hooks/use-members';
+import { usePayments } from 'src/hooks/use-payments';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -22,8 +22,8 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
-  const { members } = useMembers();
+export default function PaymentsView() {
+  const { payments } = usePayments();
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -46,7 +46,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = members.map((n) => n.name);
+      const newSelecteds = payments.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -86,7 +86,7 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: members,
+    inputData: payments,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -96,11 +96,8 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Members</Typography>
+        <Typography variant="h4">Payments</Typography>
 
-        {/* <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
-        </Button> */}
       </Stack>
 
       <Card>
@@ -116,29 +113,30 @@ export default function UserPage() {
               <UserTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={members.length}
+                rowCount={payments.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'email', label: 'Email' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
+                  { id: 'pid', label: 'Payment ID' },
+                  { id: 'spid', label: 'Sport Plan ID' },
+                  { id: 'uid', label: 'User ID' },
+                  { id: 'price', label: 'Price' },
+                  { id: 'date', label: 'Payment Date', align: 'center' },
                   { id: '' },
                 ]}
               />
               <TableBody>
                 {dataFiltered
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
+                  ?.map((row) => (
                     <UserTableRow
                       key={row.id}
-                      email={row.email}
-                      name={row.name}
-                      status={row.disabled}
-                      avatarUrl={row.photoURL}
-                      isVerified={row.emailVerified}
+                      spid={row.sportplanId}
+                      pid={row.id}
+                      uid={row.userId}
+                      price={row.price}
+                      date={row.paymentDate}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />
@@ -146,7 +144,7 @@ export default function UserPage() {
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, members.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, payments.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -158,7 +156,7 @@ export default function UserPage() {
         <TablePagination
           page={page}
           component="div"
-          count={members.length}
+          count={payments.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}

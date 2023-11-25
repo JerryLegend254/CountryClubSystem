@@ -1,20 +1,21 @@
+import { useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { useForm, Controller } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
-import { Button, Container } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
+import { Select, Button, MenuItem, Container, TextField, InputLabel, FormControl } from '@mui/material';
 
 import { useAuth } from 'src/hooks/use-auth';
-import { httpAddSportsplan } from 'src/hooks/requests';
+import { usePlans } from 'src/hooks/use-plans';
+import { httpAddToMySportsplans } from 'src/hooks/requests';
 
 import { bgGradient } from 'src/theme/css';
 
@@ -22,53 +23,75 @@ import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 import FormRow from 'src/components/form/form-row';
 
-export default function AddPlanView() {
+export default function AddUserPlanView() {
   const theme = useTheme();
 
+  const { sportplans } = usePlans();
   const navigate = useNavigate()
 
+  const { user, isLoading } = useAuth();
 
-  const { isLoading } = useAuth();
   const {
+    control,
     register,
+    setValue,
     handleSubmit,
+    watch,
     reset,
     formState: { errors },
   } = useForm();
 
+  const selectedPlan = watch('plan');
+
+  useEffect(() => {
+    const selectedSportPlan = sportplans?.find((plan) => plan.id === selectedPlan);
+    if (selectedSportPlan) {
+      setValue('amount', Number(selectedSportPlan.price));
+    }
+  }, [selectedPlan, setValue, sportplans]);
+  // const [planCost, setPlanCost] = useState('');
+
   const { mutate } = useMutation({
-    mutationFn: httpAddSportsplan,
+    mutationFn: httpAddToMySportsplans,
     onSuccess: () => {
       toast.success('New sports plan was added');
-      reset()
+      reset();
     },
     onError: (err) => toast.error(err.message),
   });
   async function onSubmit(data) {
-    // mutate(data);
-    console.log(data)
-    mutate(data)
+    const userId = user.uid;
+    mutate({ ...data, userId });
   }
 
   const renderForm = (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <FormRow error={errors?.spn?.message}>
-          <TextField
-            name="spn"
-            label="Sports plan name"
-            type="text"
-            {...register('spn', { required: 'The field is required' })}
-          />
+        <FormRow error={errors?.plan?.message}>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Sports plan</InputLabel>
+            <Controller
+              name="plan"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'This field is required' }}
+              render={({ field }) => (
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Sports plan"
+                  {...field}
+                >
+                  {sportplans?.map(({ id, name, price }) => (
+                    <MenuItem key={id} value={id}>{`${name} : $${price}`}</MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </FormControl>
         </FormRow>
-        <FormRow error={errors?.amount?.message}>
-          <TextField
-            name="amount"
-            label="Amount"
-            type="number"
-            {...register('amount', { required: 'The field is required', validate: (value) => Number(value) > 0 || "Price should be more than ksh.0" })}
-          />
-        </FormRow>
+
+        <TextField name="amount" disabled {...register('amount')} />
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
@@ -81,7 +104,7 @@ export default function AddPlanView() {
           // onClick={handleClick}
           disabled={isLoading}
         >
-          Add Plan
+          Add to my plans
         </LoadingButton>
       </Stack>
     </form>
@@ -94,10 +117,10 @@ export default function AddPlanView() {
         <Button
           variant="contained"
           color="inherit"
-          onClick={() => navigate('/view-plans')}
+          onClick={() => navigate('/user-index/user-payments')}
           endIcon={<Iconify icon="eva:eye-fill" />}
         >
-          View plans
+          View my plans
         </Button>
       </Stack>
       <Box
