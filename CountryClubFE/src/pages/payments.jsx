@@ -1,6 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 
-import { UserView } from 'src/sections/user/view';
+import { PaymentsView } from 'src/sections/payments/view';
+
+
 
 // ----------------------------------------------------------------------
 
@@ -8,10 +10,10 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> Members | Minimal UI </title>
+        <title> Payments | Minimal UI </title>
       </Helmet>
 
-      <UserView />
+      <PaymentsView />
     </>
   );
 }
