@@ -13,20 +13,25 @@ const navConfig = [
   //   icon: icon('ic_analytics'),
   // },
   {
-    title: 'user',
-    path: '/user',
-    icon: icon('ic_user'),
+    title: 'Add to my plans',
+    path: '/user-index/add-plan',
+    icon: icon('ic_addplan'),
   },
   {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
+    title: 'My payments',
+    path: '/user-index/user-payments',
+    icon: icon('ic_payments'),
   },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+  // {
+  //   title: 'login',
+  //   path: '/login',
+  //   icon: icon('ic_lock'),
+  // },
+  // {
+  //   title: 'Not found',
+  //   path: '/404',
+  //   icon: icon('ic_disabled'),
+  // },
 ];
 
 export default navConfig;
