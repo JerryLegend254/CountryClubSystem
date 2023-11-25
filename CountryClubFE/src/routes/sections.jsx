@@ -4,6 +4,7 @@ import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 import AddPlanPage from 'src/pages/add-plan';
 import UserLayout from 'src/layouts/user-dashboard';
 import DashboardLayout from 'src/layouts/dashboard';
+import AddUserPlanPage from 'src/pages/add-user-plan';
 
 import ProtectedRoute from 'src/components/auth/protected-route';
 
@@ -13,6 +14,10 @@ export const UserPage = lazy(() => import('src/pages/user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const SignUpPage = lazy(() => import('src/pages/signup'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
+export const PaymentsPage = lazy(() => import('src/pages/payments'));
+export const ViewPlansPage = lazy(() => import('src/pages/view-plans'));
+export const UserPaymentsPage = lazy(() => import('src/pages/user-payments'));
+
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -31,9 +36,11 @@ export default function Router() {
       ),
       children: [
         { element: <IndexPage />, index: true },
-        { path: 'user', element: <UserPage /> },
+        { path: 'members', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'view-plans', element: <ViewPlansPage /> },
+        { path: 'payments', element: <PaymentsPage /> },
         {
           path: 'addplan',
           element: <AddPlanPage />,
@@ -42,17 +49,24 @@ export default function Router() {
     },
 
     {
+      path: 'user-index',
       element: (
         <ProtectedRoute>
           <UserLayout>
-            <Outlet />
+            <Suspense>
+              <Outlet />
+            </Suspense>
           </UserLayout>
         </ProtectedRoute>
       ),
       children: [
         {
-          path: 'userpage',
-          element: <AddPlanPage />,
+          path: 'add-plan',
+          element: <AddUserPlanPage />,
+        },
+        {
+          path: 'user-payments',
+          element: <UserPaymentsPage />,
         },
       ],
     },
