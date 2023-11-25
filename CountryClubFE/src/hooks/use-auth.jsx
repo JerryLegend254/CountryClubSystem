@@ -4,6 +4,8 @@ import { useState, useEffect, useContext, createContext } from 'react';
 import {
   auth,
   signOut,
+  signInWithRedirect,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'src/services/firebase/index';
@@ -11,7 +13,7 @@ import {
 import { httpEmailSignUp } from './requests';
 
 const AuthContext = createContext();
-
+const provider = new GoogleAuthProvider();
 function formatFirebaseError(error) {
   let formattedError = error.replace('Firebase: Error ', '');
   formattedError = formattedError.replace(/[()]/g, '').trim();
@@ -27,7 +29,6 @@ function AuthContextProvider({ children }) {
     onAuthStateChanged(auth, async (userCred) => {
       if (userCred) {
         setUser(userCred);
-        console.log('User');
       } else {
         setUser(null);
       }
@@ -70,6 +71,10 @@ function AuthContextProvider({ children }) {
       setIsLoading(false);
     }
   }
+
+  async function signinWithGoogle() {
+   signInWithRedirect(auth, provider);
+  }
   async function login({ email, password }) {
     try {
       setIsLoading(true);
@@ -101,6 +106,7 @@ function AuthContextProvider({ children }) {
         logout,
         isLoading,
         signup,
+        signinWithGoogle
       }}
     >
       {children}
