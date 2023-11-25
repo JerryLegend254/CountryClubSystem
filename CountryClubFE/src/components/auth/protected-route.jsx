@@ -8,12 +8,30 @@ function ProtectedRoute({ children }) {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isAuthenticated) navigate('/login');
-    if (user) {
-      if (user.role === 'User') navigate('/userpage');
-    }
+  // useEffect(() => {
+  //   if (!isAuthenticated) navigate('/login');
+  //   if (user) {
+  //     if (user.email !== 'admin@gmail.com') navigate('/user-index/user-payments');
+  //   }
+  // }, [isAuthenticated, navigate, user]);
+
+useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else if (user) {
+        if (user.email === 'admin@gmail.com') {
+          // Admin can access all routes
+          return;
+        } 
+          // Basic user can access user-index/user-payments and user-index/add-plan
+          const allowedRoutes = ['/user-index/user-payments', '/user-index/add-plan'];
+          if (!allowedRoutes.includes(window.location.pathname)) {
+            navigate('/user-index/user-payments');
+          }
+        
+      }
   }, [isAuthenticated, navigate, user]);
+
 
   return isAuthenticated ? children : null;
 }

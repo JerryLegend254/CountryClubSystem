@@ -1,8 +1,8 @@
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
-import { NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -17,8 +17,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from 'src/routes/hooks';
-
 import { useAuth } from 'src/hooks/use-auth';
 
 import { bgGradient } from 'src/theme/css';
@@ -26,7 +24,6 @@ import { bgGradient } from 'src/theme/css';
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 import FormRow from 'src/components/form/form-row';
-
 
 // ----------------------------------------------------------------------
 
@@ -36,10 +33,9 @@ export async function showError(error) {
 export default function LoginView() {
   const theme = useTheme();
 
-  const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading, isAuthenticated } = useAuth();
+  const { login, isLoading, isAuthenticated, signinWithGoogle } = useAuth();
 
   // const handleClick = async () => {
   //   await login(email, password);
@@ -52,6 +48,7 @@ export default function LoginView() {
     formState: { errors },
   } = useForm();
 
+  const navigate = useNavigate();
   const { mutate } = useMutation({
     mutationFn: login,
     onSuccess: () => {
@@ -61,8 +58,8 @@ export default function LoginView() {
   });
 
   useEffect(() => {
-    if (isAuthenticated) router.push('/');
-  }, [isAuthenticated, router]);
+    if (isAuthenticated) navigate('/', { replace: true });
+  }, [isAuthenticated, navigate]);
 
   async function onSubmit(data) {
     mutate(data);
@@ -159,6 +156,7 @@ export default function LoginView() {
               color="inherit"
               variant="outlined"
               sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
+              onClick={signinWithGoogle}
             >
               <Iconify icon="eva:google-fill" color="#DF3E30" />
             </Button>

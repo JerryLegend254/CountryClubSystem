@@ -2,11 +2,10 @@ import PropTypes from 'prop-types';
 import { useState, useEffect, useContext, createContext } from 'react';
 
 import {
-  db,
-  doc,
   auth,
-  getDoc,
   signOut,
+  signInWithRedirect,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'src/services/firebase/index';
@@ -14,7 +13,7 @@ import {
 import { httpEmailSignUp } from './requests';
 
 const AuthContext = createContext();
-
+const provider = new GoogleAuthProvider();
 function formatFirebaseError(error) {
   let formattedError = error.replace('Firebase: Error ', '');
   formattedError = formattedError.replace(/[()]/g, '').trim();
@@ -23,28 +22,41 @@ function formatFirebaseError(error) {
   return formattedError;
 }
 function AuthContextProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
+  const [user, setUser] = useState(auth.currentUser);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     onAuthStateChanged(auth, async (userCred) => {
-      setIsLoading(true);
       if (userCred) {
-        const docRef = doc(db, 'userRoles', userCred.uid);
-        const docSnap = await getDoc(docRef);
-        const { role } = docSnap.data();
-
-        if (docSnap.exists()) {
-          setUser({ ...userCred, role });
-        }
+        setUser(userCred);
       } else {
         setUser(null);
       }
-      setIsLoading(false);
     });
   }, [user]);
 
+  // useEffect(() => {
+  //   let unsubscribe; // Declare a variable to store the unsubscribe function
+
+  //   if (user) {
+  //     // Add the listener and store the unsubscribe function
+  //     unsubscribe = onAuthStateChanged(auth, async (userCred) => {
+  //       if (userCred) {
+  //         setUser(userCred);
+  //         console.log("User")
+  //       } else {
+  //         setUser(null);
+  //       }
+  //     });
+  //   }
+
+  //   // Return the cleanup function to unsubscribe the listener
+  //   return () => {
+  //     if (unsubscribe) {
+  //       unsubscribe();
+  //     }
+  //   };
+  // }, [user]);
   async function signup({ email, username, password }) {
     try {
       console.log('Starting su operation');
@@ -52,23 +64,23 @@ function AuthContextProvider({ children }) {
       const res = await httpEmailSignUp({ email, password, username });
       const parsedRes = await res.json();
       if (parsedRes?.error) throw new Error(formatFirebaseError(parsedRes.error));
+      setUser(parsedRes?.user);
     } catch (err) {
       throw new Error(err.message);
     } finally {
       setIsLoading(false);
     }
   }
+
+  async function signinWithGoogle() {
+   signInWithRedirect(auth, provider);
+  }
   async function login({ email, password }) {
     try {
       setIsLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (userCredential?.user) {
-        const userId = userCredential.user.uid;
-        const docRef = doc(db, 'userRoles', userId);
-        const docSnap = await getDoc(docRef);
-        const { role } = docSnap.data();
-
-        setUser({ ...userCredential?.user, role });
+        setUser(userCredential?.user);
       }
     } catch (err) {
       throw new Error(formatFirebaseError(err.message));
@@ -80,7 +92,7 @@ function AuthContextProvider({ children }) {
   async function logout() {
     setIsLoading(true);
     await signOut(auth);
-    setUserRole(null);
+    setUser(null);
     setIsLoading(false);
   }
 
@@ -94,7 +106,7 @@ function AuthContextProvider({ children }) {
         logout,
         isLoading,
         signup,
-        userRole,
+        signinWithGoogle
       }}
     >
       {children}

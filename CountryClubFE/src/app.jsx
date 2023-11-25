@@ -9,10 +9,19 @@ import ThemeProvider from 'src/theme';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AuthContextProvider from './hooks/use-auth';
+import SportPlansContextProvider from './hooks/use-plans';
+import MembersContextProvider from './hooks/use-members';
+import PaymentsContextProvider from './hooks/use-payments';
 
 // ----------------------------------------------------------------------
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+    },
+  },
+});
 export default function App() {
   useScrollToTop();
 
@@ -36,7 +45,13 @@ export default function App() {
       />
       <AuthContextProvider>
         <ThemeProvider>
-          <Router />
+          <MembersContextProvider>
+            <SportPlansContextProvider>
+              <PaymentsContextProvider>
+                <Router />
+              </PaymentsContextProvider>
+            </SportPlansContextProvider>
+          </MembersContextProvider>
         </ThemeProvider>
       </AuthContextProvider>
     </QueryClientProvider>

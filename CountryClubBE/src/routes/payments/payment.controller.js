@@ -22,7 +22,7 @@ async function httpGetAllPayments(req, res) {
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             console.log(doc.id, " => ", doc.data());
-            payments.push({id: doc.id, ...doc.data()})
+            payments.push({id: doc.id, name: doc.id , ...doc.data()})
         });
 
         return res.status(200).json(payments)
