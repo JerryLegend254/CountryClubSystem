@@ -9,7 +9,14 @@
 // getDocs,
 import { initializeApp } from 'firebase/app';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import { getAuth, signOut, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  signOut,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithRedirect,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 
 // const firebaseConfig = {
 //   apiKey: 'AIzaSyDwKn8_iosdgqR03fYUWwNaGUIBsd4lO4c',
@@ -34,4 +41,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { db, doc, auth, getDoc, signOut, onAuthStateChanged, signInWithEmailAndPassword };
+export {
+  db,
+  doc,
+  auth,
+  getDoc,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  signInWithEmailAndPassword,
+};
