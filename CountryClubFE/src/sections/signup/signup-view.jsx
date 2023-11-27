@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -32,6 +32,7 @@ export default function SignInView() {
 
   const router = useRouter();
 
+  const queryClient = useQueryClient()
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
 
@@ -47,6 +48,7 @@ export default function SignInView() {
     mutationFn: signup,
     onSuccess: () => {
       toast.success('User was created successfully');
+      queryClient.invalidateQueries(['members'])
     },
     onError: (err) => toast.error(err.message),
   });
