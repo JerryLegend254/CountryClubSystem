@@ -29,8 +29,6 @@ export const paper = ({ theme, bgcolor, dropdown }) => ({
   }),
 });
 
-// ----------------------------------------------------------------------
-
 export const menuItem = (theme) => ({
   ...theme.typography.body2,
   padding: theme.spacing(0.75, 1),
@@ -61,7 +59,37 @@ export const menuItem = (theme) => ({
   },
 });
 
-// ----------------------------------------------------------------------
+export const buttonStyles = (theme) => ({
+  padding: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  '&:hover': {
+    backgroundColor: theme.palette.primary.dark,
+  },
+});
+
+export const containerStyles = (theme) => ({
+  margin: theme.spacing(2),
+  padding: theme.spacing(3),
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+});
+
+export const headingStyles = (theme) => ({
+  fontSize: theme.typography.h4.fontSize,
+  fontWeight: theme.typography.fontWeightBold,
+  margin: theme.spacing(2, 0),
+  color: theme.palette.primary.main,
+});
+
+export const linkStyles = {
+  textDecoration: 'none',
+  color: 'blue',
+  '&:hover': {
+    textDecoration: 'underline',
+  },
+};
 
 export function bgBlur(props) {
   const color = props?.color || '#000000';
@@ -95,8 +123,6 @@ export function bgBlur(props) {
   };
 }
 
-// ----------------------------------------------------------------------
-
 export function bgGradient(props) {
   const direction = props?.direction || 'to bottom';
   const startColor = props?.startColor;
@@ -120,8 +146,6 @@ export function bgGradient(props) {
   };
 }
 
-// ----------------------------------------------------------------------
-
 export function textGradient(value) {
   return {
     background: `-webkit-linear-gradient(${value})`,
@@ -129,8 +153,6 @@ export function textGradient(value) {
     WebkitTextFillColor: 'transparent',
   };
 }
-
-// ----------------------------------------------------------------------
 
 export const hideScroll = {
   x: {
