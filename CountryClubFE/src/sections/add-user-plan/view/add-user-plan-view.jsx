@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import {  useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -28,6 +28,7 @@ export default function AddUserPlanView() {
 
   const { sportplans } = usePlans();
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const { user, isLoading } = useAuth();
 
@@ -54,8 +55,9 @@ export default function AddUserPlanView() {
   const { mutate } = useMutation({
     mutationFn: httpAddToMySportsplans,
     onSuccess: () => {
-      toast.success('New sports plan was added');
+      toast.success('New sportsplan  has been added to your plans');
       reset();
+      queryClient.invalidateQueries(['sportsplan'])
     },
     onError: (err) => toast.error(err.message),
   });
