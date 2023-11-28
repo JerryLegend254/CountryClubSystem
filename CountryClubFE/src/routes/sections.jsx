@@ -17,6 +17,7 @@ export const ProductsPage = lazy(() => import('src/pages/products'));
 export const PaymentsPage = lazy(() => import('src/pages/payments'));
 export const ViewPlansPage = lazy(() => import('src/pages/view-plans'));
 export const UserPaymentsPage = lazy(() => import('src/pages/user-payments'));
+export const ProfilePage = lazy(() => import('src/pages/profile'));
 
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -67,6 +68,10 @@ export default function Router() {
         {
           path: 'user-payments',
           element: <UserPaymentsPage />,
+        },
+        {
+          path: 'profile',
+          element: <ProfilePage />,
         },
       ],
     },

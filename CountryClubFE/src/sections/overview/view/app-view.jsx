@@ -85,7 +85,7 @@ export default function AppView() {
           <AppCurrentVisits
             title="Revenue per plan"
             chart={{
-              series: totalPayments
+              series: totalPayments,
             }}
           />
         </Grid>

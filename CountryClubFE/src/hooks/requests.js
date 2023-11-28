@@ -27,6 +27,16 @@ export async function httpEmailSignUp(credentails) {
   });
 }
 
+export async function httpGet2FA(requestBody) {
+  return fetch(`${API_URL}/send-otp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+}
+
 export async function httpGetAllSportsplans() {
   try {
     const res = await fetch(`${API_URL}/sportsplan`);

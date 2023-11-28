@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast';
 
 import Router from 'src/routes/sections';
 import ThemeProvider from 'src/theme';
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AuthContextProvider from './hooks/use-auth';
 import SportPlansContextProvider from './hooks/use-plans';
