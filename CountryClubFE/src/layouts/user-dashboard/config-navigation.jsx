@@ -22,6 +22,11 @@ const navConfig = [
     path: '/user-index/user-payments',
     icon: icon('ic_payments'),
   },
+  {
+    title: 'Profile',
+    path: '/user-index/profile',
+    icon: icon('ic_user'),
+  },
   // {
   //   title: 'login',
   //   path: '/login',

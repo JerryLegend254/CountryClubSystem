@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { updateProfile } from 'firebase/auth';
 import { useState, useEffect, useContext, createContext } from 'react';
 
 import {
@@ -10,7 +11,7 @@ import {
   signInWithEmailAndPassword,
 } from 'src/services/firebase/index';
 
-import { httpEmailSignUp } from './requests';
+import { httpGet2FA, httpEmailSignUp } from './requests';
 
 const AuthContext = createContext();
 const provider = new GoogleAuthProvider();
@@ -59,7 +60,6 @@ function AuthContextProvider({ children }) {
   // }, [user]);
   async function signup({ email, username, password }) {
     try {
-      console.log('Starting su operation');
       setIsLoading(true);
       const res = await httpEmailSignUp({ email, password, username });
       const parsedRes = await res.json();
@@ -73,11 +73,12 @@ function AuthContextProvider({ children }) {
   }
 
   async function signinWithGoogle() {
-   signInWithRedirect(auth, provider);
+    signInWithRedirect(auth, provider);
   }
   async function login({ email, password }) {
     try {
       setIsLoading(true);
+      await httpGet2FA({ toEmail: email });
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (userCredential?.user) {
         setUser(userCredential?.user);
@@ -95,6 +96,21 @@ function AuthContextProvider({ children }) {
     setUser(null);
     setIsLoading(false);
   }
+  async function updateUserProfile({ photoUrl, username }) {
+    updateProfile(auth.currentUser, {
+      displayName: username,
+      photoURL: photoUrl,
+    })
+      .then(() => {
+        // Profile updated!
+        // ...
+      })
+      .catch((error) => {
+        // An error occurred
+        throw new Error(error)
+        // ...
+      });
+  }
 
   return (
     <AuthContext.Provider
@@ -106,7 +122,8 @@ function AuthContextProvider({ children }) {
         logout,
         isLoading,
         signup,
-        signinWithGoogle
+        signinWithGoogle,
+        updateUserProfile,
       }}
     >
       {children}

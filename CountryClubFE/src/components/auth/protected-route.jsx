@@ -24,7 +24,7 @@ useEffect(() => {
           return;
         } 
           // Basic user can access user-index/user-payments and user-index/add-plan
-          const allowedRoutes = ['/user-index/user-payments', '/user-index/add-plan'];
+          const allowedRoutes = ['/user-index/user-payments', '/user-index/add-plan', '/user-index/profile'];
           if (!allowedRoutes.includes(window.location.pathname)) {
             navigate('/user-index/user-payments');
           }
