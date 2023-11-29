@@ -3,35 +3,46 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from 'src/hooks/use-auth';
 
+import { auth } from 'src/services/firebase';
+
 // eslint-disable-next-line react/prop-types
 function ProtectedRoute({ children }) {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (!isAuthenticated) navigate('/login');
-  //   if (user) {
-  //     if (user.email !== 'admin@gmail.com') navigate('/user-index/user-payments');
-  //   }
-  // }, [isAuthenticated, navigate, user]);
-
-useEffect(() => {
+  
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     } else if (user) {
-        if (user.email === 'admin@gmail.com') {
-          // Admin can access all routes
-          return;
-        } 
-          // Basic user can access user-index/user-payments and user-index/add-plan
-          const allowedRoutes = ['/user-index/user-payments', '/user-index/add-plan', '/user-index/profile'];
-          if (!allowedRoutes.includes(window.location.pathname)) {
-            navigate('/user-index/user-payments');
-          }
-        
-      }
+       auth.currentUser
+         .getIdTokenResult()
+         .then((idTokenResult) => {
+           // Confirm the user is an Admin.
+           if (idTokenResult.claims.admin) {
+             // Show admin UI.
+             console.log("Admin")
+           } else {
+             // Show regular user UI.
+             navigate('/');
+             console.log("User")
+             const allowedRoutes = [
+               '/user-index/user-payments',
+               '/user-index/add-plan',
+              //  '/user-index/profile',
+             ];
+             if (!allowedRoutes.includes(window.location.pathname)) {
+               navigate('/user-index/user-payments');
+             }
+           }
+         })
+         .catch((error) => {
+           console.log(error);
+         });
+    }
   }, [isAuthenticated, navigate, user]);
 
+ 
 
   return isAuthenticated ? children : null;
 }
