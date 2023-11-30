@@ -21,15 +21,14 @@ function ProtectedRoute({ children }) {
            // Confirm the user is an Admin.
            if (idTokenResult.claims.admin) {
              // Show admin UI.
-             console.log("Admin")
+             navigate('/');
+
            } else {
              // Show regular user UI.
-             navigate('/');
-             console.log("User")
              const allowedRoutes = [
                '/user-index/user-payments',
                '/user-index/add-plan',
-              //  '/user-index/profile',
+               '/user-index/profile',
              ];
              if (!allowedRoutes.includes(window.location.pathname)) {
                navigate('/user-index/user-payments');
