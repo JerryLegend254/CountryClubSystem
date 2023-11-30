@@ -21,7 +21,10 @@ function ProtectedRoute({ children }) {
            // Confirm the user is an Admin.
            if (idTokenResult.claims.admin) {
              // Show admin UI.
-             navigate('/');
+              const allowedRoutes = ['/', '/members', '/view-plans', '/addplan', '/payments'];
+              if (!allowedRoutes.includes(window.location.pathname)) {
+                navigate('/');
+              }
 
            } else {
              // Show regular user UI.
