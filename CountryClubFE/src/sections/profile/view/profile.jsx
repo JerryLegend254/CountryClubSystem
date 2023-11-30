@@ -16,7 +16,6 @@ import { useAuth } from 'src/hooks/use-auth';
 
 import { bgGradient } from 'src/theme/css';
 
-import Logo from 'src/components/logo';
 import FormRow from 'src/components/form/form-row';
   
 export default function ProfileView() {
@@ -97,13 +96,6 @@ export default function ProfileView() {
           height: 1,
         }}
       >
-        <Logo
-          sx={{
-            position: 'fixed',
-            top: { xs: 16, md: 24 },
-            left: { xs: 16, md: 24 },
-          }}
-        />
 
         <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
           <Card
