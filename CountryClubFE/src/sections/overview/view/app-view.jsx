@@ -18,14 +18,16 @@ export default function AppView() {
   const { plansCount } = usePlans();
   const { paymentCount, totalRevenue, totalPayments, payments } = usePayments();
 
+  const sortedPayments = payments.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate));
+
   const chartData = {
-    labels: payments.map((payment) => payment.paymentDate), // Adjust as needed
+    labels: sortedPayments.map((payment) => payment.paymentDate), // Adjust as needed
     series: [
       {
         name: 'Total Payments',
         type: 'area',
         fill: 'gradient',
-        data: payments.map((payment) => payment.price), // Replace with the actual payment data property
+        data: sortedPayments.map((payment) => payment.price), // Replace with the actual payment data property
       },
       // Add more series if needed
     ],
