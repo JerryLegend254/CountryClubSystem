@@ -18,18 +18,34 @@ export default function AppView() {
   const { plansCount } = usePlans();
   const { paymentCount, totalRevenue, totalPayments, payments } = usePayments();
 
-  const sortedPayments = payments.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate));
+
+  const groupedPayments = payments.reduce((result, payment) => {
+    const dateKey = payment.paymentDate.split('T')[0]; // Extract date portion
+    if (!result[dateKey]) {
+      result[dateKey] = [];
+    }
+    result[dateKey].push(payment);
+    return result;
+  }, {});
+
+  // Calculate the total for each day
+  const dailyTotals = Object.keys(groupedPayments).map((dateKey) => ({
+    paymentDate: dateKey, // Keep the date as a string
+    total: groupedPayments[dateKey].reduce((sum, payment) => sum + payment.price, 0),
+  }));
+
+  // Sort the daily totals by date
+  const sortedDailyTotals = dailyTotals.sort((a, b) => a.paymentDate.localeCompare(b.paymentDate));
 
   const chartData = {
-    labels: sortedPayments.map((payment) => payment.paymentDate), // Adjust as needed
+    labels: sortedDailyTotals.map((total) => total.paymentDate),
     series: [
       {
         name: 'Total Payments',
         type: 'area',
         fill: 'gradient',
-        data: sortedPayments.map((payment) => payment.price), // Replace with the actual payment data property
+        data: sortedDailyTotals.map((total) => total.total),
       },
-      // Add more series if needed
     ],
   };
   return (
