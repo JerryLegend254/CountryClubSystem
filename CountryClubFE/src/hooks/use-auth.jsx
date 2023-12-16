@@ -15,7 +15,7 @@ import { httpGet2FA, httpEmailSignUp } from './requests';
 
 const AuthContext = createContext();
 const provider = new GoogleAuthProvider();
-function formatFirebaseError(error) {
+export function formatFirebaseError(error) {
   let formattedError = error.replace('Firebase: Error ', '');
   formattedError = formattedError.replace(/[()]/g, '').trim();
   formattedError = formattedError.charAt(0).toUpperCase() + formattedError.slice(1);

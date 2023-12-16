@@ -1,24 +1,39 @@
 import PropTypes from 'prop-types';
 import { useQuery } from '@tanstack/react-query';
-import {  useContext, createContext } from 'react';
+import { useState, useContext, createContext } from 'react';
 
-import { httpGetAllSportsplans } from './requests';
+import { httpDeletePlan, httpGetAllSportsplans } from './requests';
 
 const SportPlansContext = createContext();
 
 function SportPlansContextProvider({ children }) {
-  const {  data: sportplans } = useQuery({
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: sportplans } = useQuery({
     queryKey: ['sportplans'],
     queryFn: httpGetAllSportsplans,
   });
 
-  const plansCount = sportplans?.length
+  async function deletePlan(id) {
+    try {
+      setIsLoading(true);
+      const res = await httpDeletePlan(id);
+      await res.json();
+    } catch (err) {
+      throw new Error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const plansCount = sportplans?.length;
   return (
     <SportPlansContext.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
       value={{
         sportplans,
-        plansCount
+        plansCount,
+        deletePlan,
+        isLoading
       }}
     >
       {children}

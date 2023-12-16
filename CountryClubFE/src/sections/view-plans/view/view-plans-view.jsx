@@ -136,6 +136,7 @@ export default function ViewPlansView() {
                   .map((row) => (
                     <UserTableRow
                       key={row.id}
+                      plan_id={row.id}
                       name={row.name}
                       price={row.price}
                       selected={selected.indexOf(row.name) !== -1}

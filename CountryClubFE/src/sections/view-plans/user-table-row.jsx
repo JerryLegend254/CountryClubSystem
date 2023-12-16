@@ -10,12 +10,15 @@ import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
+import { usePlans } from 'src/hooks/use-plans';
+
 import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({ selected, name, price, handleClick }) {
+export default function UserTableRow({ selected, name, price, plan_id, handleClick }) {
   const [open, setOpen] = useState(null);
+  const { deletePlan } = usePlans();
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -23,6 +26,10 @@ export default function UserTableRow({ selected, name, price, handleClick }) {
 
   const handleCloseMenu = () => {
     setOpen(null);
+  };
+
+  const handleDeletePlan = async () => {
+    await deletePlan(plan_id);
   };
 
   return (
@@ -64,7 +71,7 @@ export default function UserTableRow({ selected, name, price, handleClick }) {
           Edit
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={handleDeletePlan} sx={{ color: 'error.main' }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Delete
         </MenuItem>
@@ -78,4 +85,5 @@ UserTableRow.propTypes = {
   name: PropTypes.any,
   price: PropTypes.any,
   selected: PropTypes.any,
+  plan_id: PropTypes.any
 };

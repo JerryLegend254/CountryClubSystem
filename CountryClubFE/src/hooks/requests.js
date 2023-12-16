@@ -67,6 +67,18 @@ export async function httpGetAllMembers() {
   }
 }
 
+export async function httpDeletePlan(id) {
+  try {
+    const res = await fetch(`${API_URL}/sportsplan/${id}`, {
+      method: "DELETE"
+    });
+    const data = res.json();
+    return data;
+  } catch (err) {
+    return err;
+  }
+}
+
 export async function httpAddToMySportsplans({ amount, userId, plan }) {
   const convertAmt = Number(amount);
   try {

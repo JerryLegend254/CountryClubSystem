@@ -3,6 +3,7 @@ const {
   collection,
   query,
   getDocs,
+  deleteDoc,
   getDoc,
   doc,
 } = require("firebase/firestore");
@@ -38,7 +39,6 @@ async function httpGetAllSportsplan(req, res) {
 
 async function httpGetOneSportsplan(req, res) {
   try {
-    console.log(req);
     const sportsplanId = req.params.id;
     const docRef = doc(db, "sportsplan", sportsplanId);
     const docSnap = await getDoc(docRef);
@@ -57,8 +57,19 @@ async function httpGetOneSportsplan(req, res) {
   }
 }
 
+async function httpDeleteSportsplan(req, res) {
+  try {
+    const sportsplanId = req.params.id;
+    await deleteDoc(doc(db, "sportsplan", sportsplanId));
+    return res.status(200).json({ msg: "Deletion successful!" });
+  } catch (err) {
+    return res.status(500).json({ msg: err });
+  }
+}
+
 module.exports = {
   httpAddSportsplan,
   httpGetAllSportsplan,
   httpGetOneSportsplan,
+  httpDeleteSportsplan,
 };
